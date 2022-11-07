@@ -1,18 +1,27 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) {
-        BufferedReader reader = null;
-        try {
-            reader = new BufferedReader(new FileReader(args[0]));
+    public static void main(String[] args) throws IOException {
+//        BufferedReader reader = null;
+        try (
+//              Automate finally check
+                BufferedReader reader = new BufferedReader(new FileReader(args[0]))
+        ) {
             String inputLine = null;
             while((inputLine = reader.readLine()) != null)
                 performOperation(inputLine);
         } catch (Exception ex) {
             System.out.println("Error: " + ex.getMessage());
         }
+//        manual finally check
+//         {
+//            System.out.println("Closing file: " + args[0]);
+//            assert reader != null;
+//            reader.close();
+//        }
 
     }
 
@@ -28,22 +37,12 @@ public class Main {
     }
 
     static int execute(MathOperation operation, int leftVal, int rightVal) {
-        int result = 0;
-        switch (operation) {
-            case ADD:
-                result = leftVal + rightVal;
-                break;
-            case SUBTRACT:
-                result = leftVal - rightVal;
-                break;
-            case MULTIPLY:
-                result = leftVal * rightVal;
-                break;
-            case DIVIDE:
-                result = leftVal / rightVal;
-                break;
-        }
-        return result;
+        return switch (operation) {
+            case ADD -> leftVal + rightVal;
+            case SUBTRACT -> leftVal - rightVal;
+            case MULTIPLY -> leftVal * rightVal;
+            case DIVIDE -> leftVal / rightVal;
+        };
     }
 
     static int valueFromWord(String word) {
