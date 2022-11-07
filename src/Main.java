@@ -1,10 +1,11 @@
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
 public class Main {
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
 //        BufferedReader reader = null;
         try (
 //              Automate finally check
@@ -13,6 +14,14 @@ public class Main {
             String inputLine = null;
             while((inputLine = reader.readLine()) != null)
                 performOperation(inputLine);
+        }
+//        Unchecked exception
+        catch (ArithmeticException ex) {
+            System.out.println("Invalid math operation: " + ex.getMessage());
+        }
+//        Checked exception
+        catch (FileNotFoundException ex) {
+            System.out.println("File not found: " + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("Error: " + ex.getMessage());
         }
