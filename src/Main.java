@@ -11,9 +11,7 @@ public class Main {
 //              Automate finally check
                 BufferedReader reader = new BufferedReader(new FileReader(args[0]))
         ) {
-            String inputLine = null;
-            while((inputLine = reader.readLine()) != null)
-                performOperation(inputLine);
+            processFile(reader);
         }
 //        Unchecked exception
         catch (ArithmeticException ex) {
@@ -22,6 +20,10 @@ public class Main {
 //        Checked exception
         catch (FileNotFoundException ex) {
             System.out.println("File not found: " + ex.getMessage());
+        } catch (IOException ex) {
+            System.out.println("IOException Error: " + ex.getMessage());
+        } catch (InvalidStatementException ex) {
+            System.out.println("InvalidStatementException Error: " + ex.getMessage());
         } catch (Exception ex) {
             System.out.println("Error: " + ex.getMessage());
         }
@@ -34,8 +36,17 @@ public class Main {
 
     }
 
-    private static void performOperation(String inputLine) {
+    private static void processFile(BufferedReader reader) throws IOException, InvalidStatementException {
+        String inputLine = null;
+        while ((inputLine = reader.readLine()) != null)
+            performOperation(inputLine);
+    }
+
+    private static void performOperation(String inputLine) throws InvalidStatementException {
         String[] parts = inputLine.split(" ");
+
+        if (parts.length != 3) throw new InvalidStatementException("Statement must have 3 parts");
+
         MathOperation operation = MathOperation.valueOf(parts[0].toUpperCase());
         int leftVal = valueFromWord(parts[1]);
         int rightVal = valueFromWord(parts[2]);
@@ -46,12 +57,20 @@ public class Main {
     }
 
     static int execute(MathOperation operation, int leftVal, int rightVal) {
-        return switch (operation) {
-            case ADD -> leftVal + rightVal;
-            case SUBTRACT -> leftVal - rightVal;
-            case MULTIPLY -> leftVal * rightVal;
-            case DIVIDE -> leftVal / rightVal;
-        };
+        int result = 0;
+        switch (operation) {
+            case ADD -> result = leftVal + rightVal;
+            case SUBTRACT -> result = leftVal - rightVal;
+            case MULTIPLY -> result = leftVal * rightVal;
+            case DIVIDE -> {
+                if (rightVal == 0) {
+                    throw new IllegalArgumentException("Cannot divide with value zero.");
+                }
+                result = leftVal / rightVal;
+            }
+        }
+        ;
+        return result;
     }
 
     static int valueFromWord(String word) {
@@ -60,13 +79,13 @@ public class Main {
                 "five", "six", "seven", "eight", "nine"
         };
         int value = -1;
-        for(int index = 0; index < numberWords.length; index++) {
-            if(word.equals(numberWords[index])) {
+        for (int index = 0; index < numberWords.length; index++) {
+            if (word.equals(numberWords[index])) {
                 value = index;
                 break;
             }
         }
-        if(value == -1)
+        if (value == -1)
             value = Integer.parseInt(word);
 
         return value;
